@@ -1,21 +1,23 @@
 const express = require('express');
 const app = express();
+const {userAuth, adminAuth} = require('./middlewares/userAuth');
+// Middleware function to check for authorization
+app.use('/user', userAuth);
+app.get("/user/adduser",(req,res,next) => {
+    res.send('add user');
+})
+app.get("/user/deleteuser",(req,res,next) => {
+    res.send('delete user');
+})
+app.get("/admin",adminAuth,(req,res,next) => {
+    res.send('admin page');
+})
 
-app.get("/user",[(req,res,next) => {
-    console.log(req.params)
-    next();
-    // res.send('Hello World');
-    
-}], [(req, res,next) => {
-    console.log('This is the second callback');
-    next();
-    // res.send('This is the second callback response');
-    
-},(req, res,next) => {
-    console.log('This is the third callback');
-    next();
-    res.send('This is the third callback response');
-}]);
+//if no need authentication for that no need to add authentication middleware
+app.post("/admin/signup",(req,res,next) => {
+    res.send('admin page');
+})
+
 app.listen(7777, () => {
     console.log('Server is running on port 7777');
 })
