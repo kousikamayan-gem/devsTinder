@@ -2,21 +2,26 @@ const express = require('express');
 const app = express();
 const {userAuth, adminAuth} = require('./middlewares/userAuth');
 // Middleware function to check for authorization
-app.use('/user', userAuth);
-app.get("/user/adduser",(req,res,next) => {
-    res.send('add user');
-})
-app.get("/user/deleteuser",(req,res,next) => {
-    res.send('delete user');
-})
-app.get("/admin",adminAuth,(req,res,next) => {
-    res.send('admin page');
+
+app.get("/getdata",(req,res,next) => {
+    // type 1 handle error in route handler
+    try{
+        throw new Error("Something went wrong");
+    } catch(err){
+        console.error(err.stack);
+        res.status(500).send('server error');
+    }
+
+    
+    // res.send('get data');
 })
 
-//if no need authentication for that no need to add authentication middleware
-app.post("/admin/signup",(req,res,next) => {
-    res.send('admin page');
+// type 2 handle error handler in middleware
+app.use("/", (err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Internal Server Error');
 })
+
 
 app.listen(7777, () => {
     console.log('Server is running on port 7777');
