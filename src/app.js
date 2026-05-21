@@ -1,28 +1,48 @@
 const express = require('express');
 const app = express();
-const {userAuth, adminAuth} = require('./middlewares/userAuth');
-// Middleware function to check for authorization
+const User = require('./models/user');
 
-app.get("/getdata",(req,res,next) => {
-    // type 1 handle error in route handler
-    try{
-        throw new Error("Something went wrong");
-    } catch(err){
-        console.error(err.stack);
-        res.status(500).send('server error');
+
+app.use(express.json());
+app.post('/signup', async(req, res)=> {
+    const userObject = new User(req.body)
+    try {
+    await userObject.save();
+    res.send("User added succesfully")
+    } catch (error) {
+        console.error('Error adding user:', error);
+        res.status(400).send("Error adding user")
     }
 
-    
-    // res.send('get data');
+})
+app.get('/user', async(req,res) => {
+    try {
+        const user = await User.findOne({email: req.body.email})
+        if (user) {            
+            res.send(user)
+        } else {
+            res.status(404).send("User not found")
+        }
+    } catch (error) {
+        console.error('Error finding user:', error);
+        res.status(500).send("Error finding user")
+    }
 })
 
-// type 2 handle error handler in middleware
-app.use("/", (err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Internal Server Error');
+app.get('/feed', async(req, res) => {
+    try {
+        const users = await User.find();
+        res.send(users)
+    } catch (error) {
+        res.status(500).send("Error fetching feed");
+    }
 })
 
-
-app.listen(7777, () => {
+const connectDB = require('./config/database')
+// mongodb+srv://kousikamayan_db_user:OzfMpRnnagnh0Zf4@devtinder.ur11zcm.mongodb.net/?appName=devtinder
+connectDB().then(() =>{
+    console.log('Connected to MongoDB');
+    app.listen(7777, () => {
     console.log('Server is running on port 7777');
 })
+});
