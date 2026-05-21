@@ -38,6 +38,26 @@ app.get('/feed', async(req, res) => {
     }
 })
 
+app.delete('/user', async(req,res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.body.userId)
+        res.send("User deleted successfully")
+    } catch (error) {
+        res.status(500).send("Error fetching user details");
+    }
+})
+
+app.patch('/user', async(req,res) => {
+    try {
+        console.log(req.body);
+        const user = await User.findByIdAndUpdate(req.body.userId, req.body)
+        console.log(user);
+        res.send("User updated successfully")
+    } catch (error) {
+        res.status(500).send("Error updating user details");
+    }
+})
+
 const connectDB = require('./config/database')
 // mongodb+srv://kousikamayan_db_user:OzfMpRnnagnh0Zf4@devtinder.ur11zcm.mongodb.net/?appName=devtinder
 connectDB().then(() =>{
