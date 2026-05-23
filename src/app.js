@@ -11,7 +11,7 @@ app.post('/signup', async(req, res)=> {
     res.send("User added succesfully")
     } catch (error) {
         console.error('Error adding user:', error);
-        res.status(400).send("Error adding user")
+        res.status(400).send(error.message);
     }
 
 })
@@ -50,11 +50,11 @@ app.delete('/user', async(req,res) => {
 app.patch('/user', async(req,res) => {
     try {
         console.log(req.body);
-        const user = await User.findByIdAndUpdate(req.body.userId, req.body)
+        const user = await User.findByIdAndUpdate(req.body.userId, req.body, { runValidators: true })
         console.log(user);
         res.send("User updated successfully")
     } catch (error) {
-        res.status(500).send("Error updating user details");
+        res.status(500).send(error.message);
     }
 })
 
