@@ -47,10 +47,23 @@ app.delete('/user', async(req,res) => {
     }
 })
 
-app.patch('/user', async(req,res) => {
+app.patch('/user/:userId', async(req,res) => {
+
+    
     try {
+        const userId = req.params.userId;
+        const  data = req.body;
+        const allowedUpdates = ['userId','firstName', 'lastName','age','skills', 'about', 'photoURL'];
+
+        const isAllowUpdate = Object.keys(data).every((e)=> allowedUpdates.includes(e));
+        if (!isAllowUpdate) {
+             return res.status(400).send("Invalid Updates: These fileds only can be updated - " + allowedUpdates.join(", "))
+        }
+        if (data.skills && data.skills.length > 10) {
+            return res.status(400).send("You can add maximum 10 skills")
+        }
         console.log(req.body);
-        const user = await User.findByIdAndUpdate(req.body.userId, req.body, { runValidators: true })
+        const user = await User.findByIdAndUpdate(userId, req.body, { runValidators: true })
         console.log(user);
         res.send("User updated successfully")
     } catch (error) {
