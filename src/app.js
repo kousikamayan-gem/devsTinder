@@ -26,6 +26,22 @@ app.post('/signup', async(req, res)=> {
     }
 
 })
+app.get('/login', async(req,res)=> {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({email})
+        if (!user) {
+            throw new Error("Invalid email or password")
+        }
+        const isPasswordMatch = await byscrypt.compare(password, user.password);
+        if (!isPasswordMatch) {
+            throw new Error("Invalid email or password")
+        }
+        res.send("Login successful");
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+})
 app.get('/user', async(req,res) => {
     try {
         const user = await User.findOne({email: req.body.email})
