@@ -36,12 +36,12 @@ app.get('/login', async(req,res)=> {
         if (!user) {
             throw new Error("Invalid email or password")
         }
-        const isPasswordMatch = await byscrypt.compare(password, user.password);
+        const isPasswordMatch = await user.passwordValidation(password);
         if (!isPasswordMatch) {
             throw new Error("Invalid email or password")
         }
         // create jwt teken
-        const token = jsonwebtoken.sign({_id: user._id}, "DEVS@TINDER", {expiresIn: "10h"})
+        const token = user.getJWT();
         // add jwt token in cookie
         res.cookie("token", token);
         res.send("Login successful");
