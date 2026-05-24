@@ -1,14 +1,25 @@
 const express = require('express');
 const app = express();
 const User = require('./models/user');
-
+const { validateSignupData } = require('./utils/validation');
+const byscrypt = require('bcrypt');
 
 app.use(express.json());
 app.post('/signup', async(req, res)=> {
-    const userObject = new User(req.body)
+   
     try {
-    await userObject.save();
-    res.send("User added succesfully")
+        validateSignupData(req);
+        const { firstName, lastName, email } = req.body;
+        const {password} = req.body;
+        const hashedPassword = await byscrypt.hash(password, 10);
+         const userObject = new User({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+         })
+        await userObject.save();
+        res.send("User added succesfully")
     } catch (error) {
         console.error('Error adding user:', error);
         res.status(400).send(error.message);
