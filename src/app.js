@@ -3,8 +3,10 @@ const app = express();
 const User = require('./models/user');
 const { validateSignupData } = require('./utils/validation');
 const byscrypt = require('bcrypt');
-
+const jsonwebtoken = require('jsonwebtoken')
+const cookieParser = require('cookie-parser');
 app.use(express.json());
+app.use(cookieParser());
 app.post('/signup', async(req, res)=> {
    
     try {
@@ -37,6 +39,10 @@ app.get('/login', async(req,res)=> {
         if (!isPasswordMatch) {
             throw new Error("Invalid email or password")
         }
+        // create jwt teken
+        const token = jsonwebtoken.sign({_id: user._id}, "DEVS@TINDER", {expiresIn: "10h"})
+        // add jwt token in cookie
+        res.cookie("token", token);
         res.send("Login successful");
     } catch (error) {
         res.status(500).send(error.message);
@@ -52,6 +58,22 @@ app.get('/user', async(req,res) => {
         }
     } catch (error) {
         console.error('Error finding user:', error);
+        res.status(500).send("Error finding user")
+    }
+})
+
+app.get('/profile', async(req, res) => {
+    try{
+        const verifyToken = jsonwebtoken.verify(req.cookies.token, "DEVS@TINDER");
+        if (!verifyToken) {
+            return res.status(401).send("Unauthorized")
+        }
+        const user = await User.findOne({_id: verifyToken._id});
+        if (!user) {
+            return res.status(404).send("User not found")
+        }
+        res.send(user)
+    } catch (error) {
         res.status(500).send("Error finding user")
     }
 })
@@ -99,7 +121,6 @@ app.patch('/user/:userId', async(req,res) => {
 })
 
 const connectDB = require('./config/database')
-// mongodb+srv://kousikamayan_db_user:OzfMpRnnagnh0Zf4@devtinder.ur11zcm.mongodb.net/?appName=devtinder
 connectDB().then(() =>{
     console.log('Connected to MongoDB');
     app.listen(7777, () => {
