@@ -5,6 +5,7 @@ const { validateSignupData } = require('./utils/validation');
 const byscrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken')
 const cookieParser = require('cookie-parser');
+const { userAuth } = require('./middlewares/auth');
 app.use(express.json());
 app.use(cookieParser());
 app.post('/signup', async(req, res)=> {
@@ -62,17 +63,18 @@ app.get('/user', async(req,res) => {
     }
 })
 
-app.get('/profile', async(req, res) => {
+app.get('/profile', userAuth, async(req, res) => {
     try{
-        const verifyToken = jsonwebtoken.verify(req.cookies.token, "DEVS@TINDER");
-        if (!verifyToken) {
-            return res.status(401).send("Unauthorized")
-        }
-        const user = await User.findOne({_id: verifyToken._id});
-        if (!user) {
-            return res.status(404).send("User not found")
-        }
+        const user = req.user
         res.send(user)
+    } catch (error) {
+        res.status(500).send("Error finding user")
+    }
+})
+
+app.post('/sendConnectionRequest', userAuth, async(req, res) => {
+    try{
+        res.send("Connection request sent successfully")
     } catch (error) {
         res.status(500).send("Error finding user")
     }
@@ -97,13 +99,10 @@ app.delete('/user', async(req,res) => {
 })
 
 app.patch('/user/:userId', async(req,res) => {
-
-    
     try {
         const userId = req.params.userId;
         const  data = req.body;
         const allowedUpdates = ['userId','firstName', 'lastName','age','skills', 'about', 'photoURL'];
-
         const isAllowUpdate = Object.keys(data).every((e)=> allowedUpdates.includes(e));
         if (!isAllowUpdate) {
              return res.status(400).send("Invalid Updates: These fileds only can be updated - " + allowedUpdates.join(", "))
