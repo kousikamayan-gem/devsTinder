@@ -5,7 +5,7 @@ const dns = require('dns');
 const connectDB = async () => {
     try {
         await mongoose.connect(
-'mongodb://kousikamayan_db_user:OzfMpRnnagnh0Zf4@ac-yd4pyis-shard-00-00.ur11zcm.mongodb.net:27017,ac-yd4pyis-shard-00-01.ur11zcm.mongodb.net:27017,ac-yd4pyis-shard-00-02.ur11zcm.mongodb.net:27017/devsTinder?ssl=true&replicaSet=atlas-9yzjpc-shard-0&authSource=admin&retryWrites=true&w=majority'
+'vvvv'
 );
         console.log("MongoDB connected successfully");
 
