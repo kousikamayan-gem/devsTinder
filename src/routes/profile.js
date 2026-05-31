@@ -12,12 +12,10 @@ profileRouter.get('/profile/view', userAuth, async(req, res) => {
 })
 profileRouter.patch('/profile/edit', userAuth, async(req, res) => {
     try {
-        console.log(req.body);
         const isAllowToEdit = validateProfileEditData(req);
         if (!isAllowToEdit) {
             return res.status(400).send("Invalid updates! You can only update these fields: firstName, lastName, age, skills, about, photoURL")
         }
-        console.log(req.body);
         const user = req.user;
         Object.keys(req.body).forEach((field) => { user[field] = req.body[field] });
         await user.save();
