@@ -15,6 +15,16 @@ const validateSignupData = (req)=> {
     }
 }
 
+const validateProfileEditData = (req) => {
+    const allowedToEditFields = ['firstName', 'lastName', 'age', 'skills', 'about', 'photoURL'];
+    const isAllowToEdit = Object.keys(req.body).every((field) =>allowedToEditFields.includes(field));
+    // if (!isAllowToEdit) {
+    //     throw new Error("Invalid updates! You can only update these fields: " + allowedToEditFields.join(", "));
+    // }
+    return isAllowToEdit
+}
+
 module.exports = {
     validateSignupData,
+    validateProfileEditData
 }
