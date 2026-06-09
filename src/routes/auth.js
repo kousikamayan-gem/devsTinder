@@ -20,7 +20,6 @@ authRouter.post('/signup', async(req, res)=> {
         await userObject.save();
         res.send("User added succesfully")
     } catch (error) {
-        console.error('Error adding user:', error);
         res.status(400).send(error.message);
     }
 
@@ -40,7 +39,7 @@ authRouter.post('/login', async(req,res)=> {
         const token = user.getJWT();
         // add jwt token in cookie
         res.cookie("token", token);
-        res.send("Login successful");
+        res.send(user);
     } catch (error) {
         res.status(500).send(error.message);
     }

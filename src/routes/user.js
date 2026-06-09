@@ -5,7 +5,7 @@ const connectionRequest = require('../models/connectionRequest');
 const user = require('../models/user');
 
 const SEND_DATA = 'firstName lastName skills about photoURL';
-userRouter.get('/user/request/received',userAuth, async(req, res) => {
+userRouter.get('/user/requests/received',userAuth, async(req, res) => {
     try {
 
         const userId = req.user._id;
@@ -32,13 +32,13 @@ userRouter.get('/user/connections', userAuth, async(req, res)=> {
             ]
         }).populate('fromUserId toUserId', SEND_DATA);
 
-        const responseConnection = connections.map(row => {
+        const data = connections.map(row => {
             if (row.fromUserId._id.equals(userId)) {
                 return row.toUserId;
             }
             return row.fromUserId;
         })
-        res.json({"connections": responseConnection})
+        res.json({data})
 
 
     } catch(error) {
@@ -56,7 +56,6 @@ userRouter.get('/feed', userAuth, async(req, res) => {
         const connections = await connectionRequest.find({
             $or: [ {fromUserId: userId}, {toUserId: userId}]
         }).select('fromUserId toUserId')
-        console.log(connections);
 
         const hideUsers = new Set();
         connections.map(connection => {
